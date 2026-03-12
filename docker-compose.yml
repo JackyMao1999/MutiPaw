@@ -1,0 +1,31 @@
+version: '3.8'
+
+volumes:
+  copaw-data:
+    name: ${DATA_VOLUME}
+    external: true
+
+services:
+  copaw:
+    image: ${IMAGE}
+    container_name: ${CONTAINER_NAME}  # 容器名，便于管理
+    restart: always  # 容器异常退出自动重启（生产环境必备）
+    # network_mode: host  # 对应原命令的 --network=host
+    ports:
+      - "127.0.0.1:8088:${PORT}"
+    volumes:
+      # 对应原命令的 -v 挂载（卷名:容器内路径）
+      - copaw-data:/app/working
+      - /home/ubuntu/code:/app/code
+        #environment:
+      # 原命令的 --env 参数（若有具体环境变量，补充在这里，示例如下）
+      # 示例：添加代理/路径等环境变量（根据你的实际需求补充）
+      #HTTP_PROXY: "http://172.17.0.1:7890"
+      #HTTPS_PROXY: "http://172.17.0.1:7890"
+      #PYTHONHTTP_PROXY: "http://172.17.0.1:7890"
+      #PYTHONHTTPS_PROXY: "http://172.17.0.1:7890"
+      #ALL_PROXY: "socks://172.17.0.1:7891"
+      # COPAW_HOME: "/app/working"
+      #TZ: "Asia/Shanghai"  # 时区配置（避免日志时间错乱）
+    # 资源限制（适配 Orange Pi 硬件，根据实际内存/CPU调整）
+    # 日志配置（避免日志占满磁盘）

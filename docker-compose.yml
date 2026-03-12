@@ -3,7 +3,7 @@ version: '3.8'
 volumes:
   copaw-data:
     name: ${DATA_VOLUME}
-    external: true
+    #external: true
 
 services:
   copaw:
@@ -12,7 +12,7 @@ services:
     restart: always  # 容器异常退出自动重启（生产环境必备）
     # network_mode: host  # 对应原命令的 --network=host
     ports:
-      - "127.0.0.1:8088:${PORT}"
+      - "${PORT}:8088"
     volumes:
       # 对应原命令的 -v 挂载（卷名:容器内路径）
       - copaw-data:/app/working

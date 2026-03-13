@@ -1,4 +1,4 @@
-IMAGE = "swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/agentscope/copaw:v0.0.5-linuxarm64"
+IMAGE = "swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/agentscope/copaw:v0.0.7-linuxarm64"
 [[mutipaws]]
 DATA_VOLUME = "copaw-data"
 CONTAINER_NAME = "copaw"
@@ -8,3 +8,9 @@ PORT = "8088"
 DATA_VOLUME = "copaw2-data"
 CONTAINER_NAME = "copaw2"
 PORT = "8089"
+
+[[mutipaws]]
+DATA_VOLUME = "copaw3-data"
+CONTAINER_NAME = "copaw3"
+PORT = "8090"
+

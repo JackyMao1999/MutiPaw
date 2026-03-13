@@ -1,6 +1,9 @@
 # /bin/bash
 # 这是一个启动程序
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+
+PAW_NAME=$1
+
 # 1. 初始化环境
 if ! dpkg -s python3-dev &>/dev/null; then
     sudo apt install python3-dev
@@ -19,4 +22,8 @@ source .venv/bin/activate
 pip3 install -r requirements.txt
 
 # 4. 启动程序
-python3 mutipaw.py --option="start"
+if [[ "x${PAW_NAME}" != "x" ]]; then
+    python3 mutipaw.py --option="start" --paw=${PAW_NAME}
+else
+    python3 mutipaw.py --option="start"
+fi

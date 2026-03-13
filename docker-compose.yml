@@ -10,7 +10,7 @@ services:
     image: ${IMAGE}
     container_name: ${CONTAINER_NAME}  # 容器名，便于管理
     restart: always  # 容器异常退出自动重启（生产环境必备）
-    # network_mode: host  # 对应原命令的 --network=host
+    network_mode: ${NETWORK_MODE:-bridge}  # 对应原命令的 --network=host
     ports:
       - "${PORT}:8088"
     volumes:

@@ -30,7 +30,6 @@ def start_paws():
     paws_list = file["mutipaws"]
     for paw in paws_list:
         env["CONTAINER_NAME"] = paw["CONTAINER_NAME"] 
-        env["DATA_VOLUME"] = paw["DATA_VOLUME"]
         env["PORT"] = paw["PORT"]
         env["COMPOSE_PROJECT_NAME"] = paw["CONTAINER_NAME"]
         if "NETWORK_MODE" in paw:
@@ -100,7 +99,6 @@ def start_single_paw(paw_name):
         if paw["CONTAINER_NAME"] == paw_name:
             env = os.environ.copy()
             env["CONTAINER_NAME"] = paw["CONTAINER_NAME"] 
-            env["DATA_VOLUME"] = paw["DATA_VOLUME"]
             env["PORT"] = paw["PORT"]
             env["COMPOSE_PROJECT_NAME"] = paw["CONTAINER_NAME"]
             if "NETWORK_MODE" in paw:

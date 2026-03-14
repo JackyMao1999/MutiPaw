@@ -2,8 +2,10 @@ version: '3.8'
 
 volumes:
   copaw-data:
-    name: ${DATA_VOLUME}
+    name: ${CONTAINER_NAME}-data
     #external: true
+  copaw-secrets:
+    name: ${CONTAINER_NAME}-secrets
 
 services:
   copaw:
@@ -16,6 +18,7 @@ services:
     volumes:
       # 对应原命令的 -v 挂载（卷名:容器内路径）
       - copaw-data:/app/working
+      - copaw-secrets:/app/working.secret
       - /home/ubuntu/code:/app/code
         #environment:
       # 原命令的 --env 参数（若有具体环境变量，补充在这里，示例如下）

@@ -126,6 +126,13 @@ MutiPaw/
 ├── mutipaw.py          # 多智能体管理核心脚本
 ├── start_up.sh         # 启动脚本
 ├── stop.sh             # 停止脚本
+├── monitoring/         # 监控面板
+│   ├── monitor.py      # Flask 监控服务
+│   ├── templates/      # HTML 模板
+│   ├── static/         # 静态资源
+│   │   ├── css/        # CSS 样式
+│   │   └── js/         # JavaScript 工具
+│   └── start_monitor.sh # 监控启动脚本
 ├── requirements.txt    # Python 依赖
 ├── README.md          # 项目文档
 └── .venv/             # Python 虚拟环境
@@ -162,10 +169,41 @@ MutiPaw/
 2. 重新运行 `./start_up.sh`
 3. 新实例将自动创建
 
+### 📊 监控面板使用
+
+#### 启动监控面板
+```bash
+cd monitoring/
+./start_monitor.sh
+```
+
+#### 访问监控界面
+- **地址**: http://localhost:8090
+- **功能**: 
+  - 实时容器状态监控
+  - CPU/内存使用率显示
+  - 网络流量统计
+  - 健康检查和自动恢复
+  - 支持暗色主题
+
+#### 监控面板功能
+1. **状态概览** - 总容器数、运行中、已停止、异常数量
+2. **详细监控** - 每个容器的性能指标和状态信息
+3. **实时更新** - 每5秒自动刷新数据
+4. **手动控制** - 开始/停止监控功能
+5. **错误处理** - 异常状态和错误信息显示
+
+#### API 接口
+- `GET /api/status` - 获取容器状态
+- `GET /api/health` - 健康检查
+- `POST /api/start_monitoring` - 开始监控
+- `POST /api/stop_monitoring` - 停止监控
+
 ## 后续计划
 
 - [x] 实现精细化容器管理（单个启动/停止）
 - [x] 支持网络模式配置
+- [x] 添加多智能体状态监控面板
 - [ ] 提供更多预设的智能体角色模板
 - [ ] 优化多智能体之间的通信与协同逻辑
 - [ ] 添加健康检查和自动恢复功能

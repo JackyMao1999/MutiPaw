@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MutiPaw 多智能体监控面板</title>
+    
+    <!-- 静态资源 -->
+    <link rel="stylesheet" href="/monitoring/static/css/monitor.css">
+    
+    <!-- CSS 样式 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* 头部样式 */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* 控制栏 */
+        .control-bar {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .control-btn.stop {
+            background: #ff6b6b;
+        }
+
+        .control-btn.stop:hover {
+            background: #ff5252;
+        }
+
+        /* 统计卡片 */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.total {
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card.running {
+            border-left: 4px solid #4caf50;
+        }
+
+        .stat-card.stopped {
+            border-left: 4px solid #ff9800;
+        }
+
+        .stat-card.error {
+            border-left: 4px solid #f44336;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        /* 容器列表 */
+        .container-list {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem 2rem;
+        }
+
+        .container-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .container-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .container-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .container-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .container-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .container-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-running { background: #d4edda; color: #155724; }
+        .status-stopped { background: #fff3cd; color: #856404; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-not_found { background: #e2e3e5; color: #383d41; }
+
+        .container-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 1rem;
+            }
+
+            .container-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .control-bar {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <div class="header">
+        <h1>🔍 MutiPaw 多智能体监控面板</h1>
+        <p>实时监控您的智能体状态和性能指标</p>
+    </div>
+
+    <!-- 控制栏 -->
+    <div class="control-bar">
+        <button id="startMonitoring" class="control-btn">▶️ 开始监控</button>
+        <button id="stopMonitoring" class="control-btn stop" style="display: none;">⏹️ 停止监控</button>
+        <div>
+            <span id="lastUpdate">最后更新: --</span>
+        </div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-container">
+        <div class="stat-card total">
+            <div class="stat-value" id="totalContainers">0</div>
+            <div class="stat-label">总容器数</div>
+        </div>
+        <div class="stat-card running">
+            <div class="stat-value" id="runningContainers">0</div>
+            <div class="stat-label">运行中</div>
+        </div>
+        <div class="stat-card stopped">
+            <div class="stat-value" id="stoppedContainers">0</div>
+            <div class="stat-label">已停止</div>
+        </div>
+        <div class="stat-card error">
+            <div class="stat-value" id="errorContainers">0</div>
+            <div class="stat-label">异常</div>
+        </div>
+    </div>
+
+    <!-- 容器列表 -->
+    <div class="container-list">
+        <h2 style="padding: 0 2rem 1rem;">📋 容器状态详情</h2>
+        <div class="container-grid" id="containerGrid">
+            <!-- 容器卡片将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/monitoring/static/js/utils.js"></script>
+    <script>
+        // DOM 元素
+        const startBtn = document.getElementById('startMonitoring');
+        const stopBtn = document.getElementById('stopMonitoring');
+        const lastUpdateEl = document.getElementById('lastUpdate');
+        const containerGrid = document.getElementById('containerGrid');
+
+        // 统计数据元素
+        const statsEls = {
+            total: document.getElementById('totalContainers'),
+            running: document.getElementById('runningContainers'),
+            stopped: document.getElementById('stoppedContainers'),
+            error: document.getElementById('errorContainers')
+        };
+
+        // 全局变量
+        let monitoringInterval;
+        let isMonitoring = false;
+
+        // 启动监控
+        async function startMonitoring() {
+            try {
+                const response = await fetch('/api/start_monitoring');
+                if (response.ok) {
+                    isMonitoring = true;
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'block';
+                    startRealTimeUpdates();
+                    showMessage('监控已开始', 'success');
+                }
+            } catch (error) {
+                console.error('启动监控失败:', error);
+                showMessage('启动监控失败', 'error');
+            }
+        }
+
+        // 停止监控
+        async function stopMonitoring() {
+            try {
+                const response = await fetch('/api/stop_monitoring');
+                if (response.ok) {
+                    isMonitoring = false;
+                    startBtn.style.display = 'block';
+                    stopBtn.style.display = 'none';
+                    clearInterval(monitoringInterval);
+                    showMessage('监控已停止', 'info');
+                }
+            } catch (error) {
+                console.error('停止监控失败:', error);
+                showMessage('停止监控失败', 'error');
+            }
+        }
+
+        // 获取状态数据
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/api/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateStats(data);
+                    updateContainerList(data.containers || []);
+                    lastUpdateEl.textContent = `最后更新: ${new Date().toLocaleString()}`;
+                }
+            } catch (error) {
+                console.error('获取状态失败:', error);
+            }
+        }
+
+        // 更新统计数据
+        function updateStats(data) {
+            statsEls.total.textContent = data.total_count || 0;
+            statsEls.running.textContent = data.running_count || 0;
+            statsEls.stopped.textContent = data.stopped_count || 0;
+            statsEls.error.textContent = data.error_count || 0;
+        }
+
+        // 更新容器列表
+        function updateContainerList(containers) {
+            containerGrid.innerHTML = '';
+
+            if (!containers || containers.length === 0) {
+                containerGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: #666;">暂无容器数据</div>';
+                return;
+            }
+
+            containers.forEach(container => {
+                const card = createContainerCard(container);
+                containerGrid.appendChild(card);
+            });
+        }
+
+        // 创建容器卡片
+        function createContainerCard(container) {
+            const div = document.createElement('div');
+            div.className = 'container-card';
+
+            const statusClass = getStatusClass(container.status);
+            const memoryPercent = container.memory_percent || 0;
+
+            div.innerHTML = `
+                <div class="container-header">
+                    <div class="container-name">${container.name}</div>
+                    <div class="container-status ${statusClass}">${getStatusText(container.status)}</div>
+                </div>
+
+                <div class="container-details">
+                    <div style="margin-bottom: 1rem;">
+                        <strong>端口:</strong> ${container.port}<br>
+                        <strong>网络模式:</strong> ${container.network_mode}
+                    </div>
+
+                    ${container.status === 'running' ? `
+                        <div class="container-metrics">
+                            <div class="metric">
+                                <div class="metric-label">CPU使用率</div>
+                                <div class="metric-value">${container.cpu_percent}%</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-label">内存使用率</div>
+                                <div class="metric-value">${memoryPercent.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${container.error ? `
+                        <div style="color: #f44336; margin-top: 1rem; padding: 0.5rem; background: #ffebee; border-radius: 5px;">
+                            <strong>错误信息:</strong> ${container.error}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            return div;
+        }
+
+        // 辅助函数
+        function getStatusClass(status) {
+            switch(status) {
+                case 'running': return 'status-running';
+                case 'exited': return 'status-stopped';
+                case 'error':
+                case 'unknown': return 'status-error';
+                default: return 'status-not_found';
+            }
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'running': return '运行中';
+                case 'exited': return '已停止';
+                case 'error':
+                case 'unknown': return '异常';
+                default: return '不存在';
+            }
+        }
+
+        // 实时更新
+        function startRealTimeUpdates() {
+            if (monitoringInterval) {
+                clearInterval(monitoringInterval);
+            }
+            fetchStatus();
+            monitoringInterval = setInterval(fetchStatus, 5000); // 每5秒更新一次
+        }
+
+        // 显示消息提示
+        function showMessage(text, type = 'info') {
+            // 这里可以添加消息提示功能
+            console.log(`${type.toUpperCase()}: ${text}`);
+        }
+
+        // 事件监听
+        startBtn.addEventListener('click', startMonitoring);
+        stopBtn.addEventListener('click', stopMonitoring);
+
+        // 页面加载时检查健康状态
+        window.addEventListener('load', async () => {
+            try {
+                const healthResponse = await fetch('/api/health');
+                if (healthResponse.ok) {
+                    const healthData = await healthResponse.json();
+                    if (healthData.monitoring) {
+                        startBtn.style.display = 'none';
+                        stopBtn.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('健康检查失败:', error);
+            }
+
+            // 初始状态检查
+            fetchStatus();
+        });
+    </script>
+</body>
+</html>
